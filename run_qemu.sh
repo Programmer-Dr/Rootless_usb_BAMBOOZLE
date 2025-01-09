@@ -1,0 +1,5 @@
+#!/data/data/com.termux/files/usr/bin/env bash
+SOCKET_FILENAME=$(mktemp /data/data/com.termux/files/home/alpine/socket.XXXXXXXXXX)
+echo $SOCKET_FILENAME
+echo $SOCKET_FILENAME > /data/data/com.termux/files/home/alpine/socket.txt
+qemu-system-x86_64 -machine q35 -m 1536 -smp cpus=4 -cpu qemu64 -drive if=pflash,format=raw,read-only=on,file=$PREFIX/share/qemu/edk2-x86_64-code.fd -netdev user,id=n1,dns=8.8.8.8,hostfwd=tcp::2222-:22 -device virtio-net,netdev=n1 -nographic /data/data/com.termux/files/home/alpine/alpine.img -fsdev local,security_model=mapped-file,id=fsdev0,multidevs=remap,path=/storage/self/primary -device virtio-9p-pci,fsdev=fsdev0,mount_tag=host_storage,id=virtio-9p-pci0   --accel tcg,thread=multi,tb-size=64    -device virtio-rng-pci  -monitor unix:$SOCKET_FILENAME,server,wait=off -serial mon:stdio  -readconfig /data/data/com.termux/files/home/alpine/ich9-ehci-uhci.cfg.txt -chardev socket,host=127.0.0.1,port=10000,id=usbredirchardev1 -device usb-redir,chardev=usbredirchardev1,id=usbredirdev1,debug=3
